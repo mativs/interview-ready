@@ -1,6 +1,4 @@
-# Django Rest Framework Challenge
-
-## 1. Implement a custom version of Model Serializer 
+# Custom Model Serializer
 
 You must implement a custom version of the class `ModelSerializer` that is provided by the `restframework` library with the following features:
 
