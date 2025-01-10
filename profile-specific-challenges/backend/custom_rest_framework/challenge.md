@@ -16,7 +16,7 @@ A test file is already created with all tests working fine.
 
 You should change the import from the original `restframework` and import your custom one while having the test still working fine. 
 
-For running the tests you should first install the depending library and then run the test
+For running the tests you should first install `Django` and `restframework`
 
 ```
 $ pipenv install
