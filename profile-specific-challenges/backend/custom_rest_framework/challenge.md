@@ -1,16 +1,14 @@
 # Custom Model Serializer
 
-You must implement a custom version of the class `ModelSerializer` that is provided by the `restframework` library with the following features:
+Your task is to implement a custom version of the `ModelSerializer` class, originally provided by the rest_framework library, with the following features:
 
-1. The fields should be populated automatically based on the `Meta` `fields` parameters 
-2. Implement `CharField`, `IntegerField`, `BooleanField`, `FloatField`, `EmailField` and `SlugField`
-3. Implement `read_only` and `write_only` parameters 
-4. Implement `read`, `create` and `write` operations for the serializer
-5. Create validations for `IntegerField`, `BooleanField`, `EmailField`, `SlugField`
+1. The serializer should automatically define its fields based on the `fields` parameter in the `Meta` class. 
+2. Implement support for the following field types: `CharField`, `IntegerField`, `BooleanField`, `FloatField`, `EmailField` and `SlugField`
+3. Implement the `read_only` and `write_only` parameters for the fields.
+4. Implement the following methods in the serializer: `read`, `create` and `write`.
+5. Implement proper validations for: `IntegerField`, `BooleanField`, `EmailField`, `SlugField`
 
-The app `custom_rest_framework` has already been created with a dummy model `TestSerializerModel` with the required columns. 
-
-A test file is already created with all tests working fine. 
+The app `custom_rest_framework` has already been created with a dummy model named `TestSerializerModel` with the necessary fields. Additionally, a test file has been pre-configured, containing all the necessary test cases.
 
 You should change the import from the original `restframework` and import your custom one while having the test still working fine. 
 
