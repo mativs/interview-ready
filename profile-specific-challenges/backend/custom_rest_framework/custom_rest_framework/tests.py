@@ -49,12 +49,20 @@ class TestSerializer(TestCase):
             assert hasattr(instance, k)
             assert getattr(instance, k) == v
 
+    def assertDictionary(self, source: dict, data: dict, exclude: list = dict()):
+        """Assert that all the values in the data should exists in the source."""
+        for k, v in data.items():
+            if k not in exclude:
+                assert source.get(k) is not None, f"{k} should be in source"
+                assert source.get(k) == v, f"{source.get(k)} != {v}"
+
     def test_read(self):
         """We create a model on DB and then check the serialized data is correct."""
         data = self.create_random_data()
         instance = TestSerializerModel.objects.create(**data)
         serializer = TestModelSerializer(instance)
         self.assertInstance(instance, serializer.data)
+        self.assertDictionary(serializer.data, data, ["password"])
 
     def test_create(self):
         """We create a model through the serializer and check that it was created
@@ -125,6 +133,7 @@ class TestSerializer(TestCase):
         serialized_data = serializer.data
         self.assertInstance(instance, serialized_data)
         self.assertFalse("password" in serialized_data)
+        self.assertDictionary(serializer.data, data, ["password"])
 
     def test_read_only(self):
         """We create a model through the serializer and check that it was created
@@ -139,3 +148,4 @@ class TestSerializer(TestCase):
         instance = TestSerializerModel.objects.last()
         self.assertInstance(instance, data)
         self.assertNotEqual(instance.generated, "fixed")
+        self.assertDictionary(serializer.data, data, ["password"])
