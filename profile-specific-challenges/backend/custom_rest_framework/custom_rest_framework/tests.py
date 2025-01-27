@@ -37,7 +37,7 @@ class TestSerializer(TestCase):
             number=random.randint(0, 1000),
             is_something=random.choices([True, False])[0],
             slug=str(random.randint(1000, 2000)),
-            email=f"{str(random.randint(10000, 20000))}@{random.randint(1000,2000)}.com",
+            email=f"{str(random.randint(10000, 20000))}@{random.randint(1000, 2000)}.com",
             real=random.randint(1000, 9999) / 100,
             password=str(random.randint(100000, 999999)),
         )
@@ -56,16 +56,6 @@ class TestSerializer(TestCase):
         serializer = TestModelSerializer(instance)
         self.assertInstance(instance, serializer.data)
 
-    def test_write_only(self):
-        """We create a model on DB and then check the serialized data without the
-        write only field."""
-        data = self.create_random_data()
-        instance = TestSerializerModel.objects.create(**data)
-        serializer = TestModelSerializer(instance)
-        serialized_data = serializer.data
-        self.assertInstance(instance, serialized_data)
-        self.assertFalse("password" in serialized_data)
-
     def test_create(self):
         """We create a model through the serializer and check that it was created
         correctly in DB."""
@@ -75,20 +65,6 @@ class TestSerializer(TestCase):
         serializer.save()
         instance = TestSerializerModel.objects.last()
         self.assertInstance(instance, data)
-
-    def test_read_only(self):
-        """We create a model through the serializer and check that it was created
-        correctly skipping the write only field."""
-        data = self.create_random_data()
-        data["generated"] = "fixed"
-        serializer = TestModelSerializer(data=data)
-        self.assertTrue(serializer.is_valid())
-        serializer.save()
-
-        del data["generated"]
-        instance = TestSerializerModel.objects.last()
-        self.assertInstance(instance, data)
-        self.assertNotEqual(instance.generated, "fixed")
 
     def test_update(self):
         """We update a model through the serializer and check that the values were
@@ -139,3 +115,27 @@ class TestSerializer(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertEqual(len(serializer.errors), 1)
         self.assertTrue("slug" in serializer.errors)
+
+    def test_write_only(self):
+        """We create a model on DB and then check the serialized data without the
+        write only field."""
+        data = self.create_random_data()
+        instance = TestSerializerModel.objects.create(**data)
+        serializer = TestModelSerializer(instance)
+        serialized_data = serializer.data
+        self.assertInstance(instance, serialized_data)
+        self.assertFalse("password" in serialized_data)
+
+    def test_read_only(self):
+        """We create a model through the serializer and check that it was created
+        correctly skipping the write only field."""
+        data = self.create_random_data()
+        data["generated"] = "fixed"
+        serializer = TestModelSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        serializer.save()
+
+        del data["generated"]
+        instance = TestSerializerModel.objects.last()
+        self.assertInstance(instance, data)
+        self.assertNotEqual(instance.generated, "fixed")
