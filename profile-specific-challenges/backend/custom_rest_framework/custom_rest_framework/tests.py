@@ -42,25 +42,28 @@ class TestSerializer(TestCase):
             password=str(random.randint(100000, 999999)),
         )
 
-    def assertInstance(self, instance: Any, data: dict):
+    def assertInstance(self, instance: Any, data: dict, eclude: list = list()):
         """Assert that all the values in the dictionary exists as a property in the
         instance."""
-        for k, v in data.items():
-            assert hasattr(instance, k)
-            assert getattr(instance, k) == v
+        if data and instance:
+            for k, v in data.items():
+                assert hasattr(instance, k)
+                assert getattr(instance, k) == v
 
-    def assertDictionary(self, source: dict, data: dict, exclude: list = dict()):
+    def assertDictionary(self, source: dict, data: dict, exclude: list = list()):
         """Assert that all the values in the data should exists in the source."""
-        for k, v in data.items():
-            if k not in exclude:
-                assert source.get(k) is not None, f"{k} should be in source"
-                assert source.get(k) == v, f"{source.get(k)} != {v}"
+        if data and source:
+            for k, v in data.items():
+                if k not in exclude:
+                    assert source.get(k) is not None, f"{k} should be in source"
+                    assert source.get(k) == v, f"{source.get(k)} != {v}"
 
     def test_read(self):
         """We create a model on DB and then check the serialized data is correct."""
         data = self.create_random_data()
         instance = TestSerializerModel.objects.create(**data)
         serializer = TestModelSerializer(instance)
+        self.assertIsNotNone(serializer.data)
         self.assertInstance(instance, serializer.data)
         self.assertDictionary(serializer.data, data, ["password"])
 
@@ -132,6 +135,7 @@ class TestSerializer(TestCase):
         serializer = TestModelSerializer(instance)
         serialized_data = serializer.data
         self.assertInstance(instance, serialized_data)
+        self.assertIsNotNone(serialized_data)
         self.assertFalse("password" in serialized_data)
         self.assertDictionary(serializer.data, data, ["password"])
 
