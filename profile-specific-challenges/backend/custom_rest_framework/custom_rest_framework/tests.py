@@ -42,32 +42,50 @@ class TestSerializer(TestCase):
             password=str(random.randint(100000, 999999)),
         )
 
-    def assertInstance(self, instance: Any, data: dict, eclude: list = list()):
+    def assertInstance(self, instance: Any, data: dict, exclude: list = list()):
         """Assert that all the values in the dictionary exists as a property in the
         instance."""
         if data and instance:
             for k, v in data.items():
-                assert hasattr(instance, k)
-                assert getattr(instance, k) == v
-
-    def assertDictionary(self, source: dict, data: dict, exclude: list = list()):
-        """Assert that all the values in the data should exists in the source."""
-        if data and source:
-            for k, v in data.items():
                 if k not in exclude:
-                    assert source.get(k) is not None, f"{k} should be in source"
-                    assert source.get(k) == v, f"{source.get(k)} != {v}"
+                    assert hasattr(instance, k), (
+                        f"Property {k} should exist in instance"
+                    )
+                    assert getattr(instance, k) == v, (
+                        f"Property value '{v}' should be equals to instance value"
+                    )
 
-    def test_read(self):
+    def assertEqualDictionary(self, left: dict, right: dict, exclude: list = list()):
+        """Assert that all the values in the right should exists in the left."""
+        if right and left:
+            for k, v in right.items():
+                if k not in exclude:
+                    assert left.get(k) is not None, (
+                        f"Property {k} should be in left dictionary"
+                    )
+                    assert left.get(k) == v, (
+                        f"Property value '{left.get(k)}' should be equals to right value {v}"
+                    )
+
+            for k, v in left.items():
+                if k not in exclude:
+                    assert right.get(k) is not None, (
+                        f"Property {k} should be in right dictionary"
+                    )
+                    assert right.get(k) == v, (
+                        f"Property value '{left.get(k)}' should be equals to right value {v}"
+                    )
+
+    def test_1_read(self):
         """We create a model on DB and then check the serialized data is correct."""
         data = self.create_random_data()
         instance = TestSerializerModel.objects.create(**data)
         serializer = TestModelSerializer(instance)
-        self.assertIsNotNone(serializer.data)
+        self.assertIsNotNone(serializer.data, "Serializer should return some data")
         self.assertInstance(instance, serializer.data)
-        self.assertDictionary(serializer.data, data, ["password"])
+        self.assertEqualDictionary(serializer.data, data, ["password", "generated"])
 
-    def test_create(self):
+    def test_2_create(self):
         """We create a model through the serializer and check that it was created
         correctly in DB."""
         data = self.create_random_data()
@@ -77,7 +95,7 @@ class TestSerializer(TestCase):
         instance = TestSerializerModel.objects.last()
         self.assertInstance(instance, data)
 
-    def test_update(self):
+    def test_3_update(self):
         """We update a model through the serializer and check that the values were
         correctly updated in DB."""
         data = self.create_random_data()
@@ -91,65 +109,69 @@ class TestSerializer(TestCase):
         new_instance = TestSerializerModel.objects.get(id=instance.id)
         self.assertInstance(new_instance, new_data)
 
-    def test_error_int(self):
+    def test_4_error_int(self):
         """We force an error on creation on the number field."""
         data = self.create_random_data()
         data["number"] = "15.5"
         serializer = TestModelSerializer(data=data)
         self.assertFalse(serializer.is_valid())
+        self.assertIsNotNone(serializer.errors)
         self.assertEqual(len(serializer.errors), 1)
         self.assertTrue("number" in serializer.errors)
 
-    def test_error_bool(self):
+    def test_5_error_bool(self):
         """We force an error on creation on the bool field."""
         data = self.create_random_data()
         data["is_something"] = "jojo"
         serializer = TestModelSerializer(data=data)
         self.assertFalse(serializer.is_valid())
+        self.assertIsNotNone(serializer.errors)
         self.assertEqual(len(serializer.errors), 1)
         self.assertTrue("is_something" in serializer.errors)
 
-    def test_error_email(self):
+    def test_6_error_email(self):
         """We force an error on creation on the email field."""
         data = self.create_random_data()
         data["email"] = "not_an_email"
         serializer = TestModelSerializer(data=data)
         self.assertFalse(serializer.is_valid())
+        self.assertIsNotNone(serializer.errors)
         self.assertEqual(len(serializer.errors), 1)
         self.assertTrue("email" in serializer.errors)
 
-    def test_error_slug(self):
+    def test_7_error_slug(self):
         """We force an error on creation on the slug field."""
         data = self.create_random_data()
         data["slug"] = "not_an_slug./$"
         serializer = TestModelSerializer(data=data)
         self.assertFalse(serializer.is_valid())
+        self.assertIsNotNone(serializer.errors)
         self.assertEqual(len(serializer.errors), 1)
         self.assertTrue("slug" in serializer.errors)
 
-    def test_write_only(self):
+    def test_8_write_only(self):
         """We create a model on DB and then check the serialized data without the
         write only field."""
         data = self.create_random_data()
         instance = TestSerializerModel.objects.create(**data)
         serializer = TestModelSerializer(instance)
         serialized_data = serializer.data
-        self.assertInstance(instance, serialized_data)
         self.assertIsNotNone(serialized_data)
+        self.assertInstance(instance, serialized_data)
         self.assertFalse("password" in serialized_data)
-        self.assertDictionary(serializer.data, data, ["password"])
+        self.assertEqualDictionary(serializer.data, data, ["password", "generated"])
 
-    def test_read_only(self):
+    def test_9_read_only(self):
         """We create a model through the serializer and check that it was created
         correctly skipping the write only field."""
         data = self.create_random_data()
-        data["generated"] = "fixed"
+        data["generated"] = "fixed"  # we write a wrong value in a generated field
         serializer = TestModelSerializer(data=data)
         self.assertTrue(serializer.is_valid())
         serializer.save()
-
-        del data["generated"]
         instance = TestSerializerModel.objects.last()
-        self.assertInstance(instance, data)
-        self.assertNotEqual(instance.generated, "fixed")
-        self.assertDictionary(serializer.data, data, ["password"])
+        self.assertIsNotNone(serializer.data)
+        self.assertInstance(instance, data, ["generated"])
+        self.assertNotEqual(instance.generated, data["generated"])
+        self.assertEqual(instance.generated, f"{data['slug']}:{str(data['number'])}")
+        self.assertEqualDictionary(serializer.data, data, ["password", "generated"])
