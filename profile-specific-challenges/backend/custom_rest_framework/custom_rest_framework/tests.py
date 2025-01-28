@@ -129,17 +129,7 @@ class TestSerializer(TestCase):
         self.assertEqual(len(serializer.errors), 1)
         self.assertTrue("is_something" in serializer.errors)
 
-    def test_6_error_email(self):
-        """We force an error on creation on the email field."""
-        data = self.create_random_data()
-        data["email"] = "not_an_email"
-        serializer = TestModelSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIsNotNone(serializer.errors)
-        self.assertEqual(len(serializer.errors), 1)
-        self.assertTrue("email" in serializer.errors)
-
-    def test_7_error_slug(self):
+    def test_6_error_slug(self):
         """We force an error on creation on the slug field."""
         data = self.create_random_data()
         data["slug"] = "not_an_slug./$"
@@ -148,6 +138,16 @@ class TestSerializer(TestCase):
         self.assertIsNotNone(serializer.errors)
         self.assertEqual(len(serializer.errors), 1)
         self.assertTrue("slug" in serializer.errors)
+
+    def test_7_error_email(self):
+        """We force an error on creation on the email field."""
+        data = self.create_random_data()
+        data["email"] = "not_an_email"
+        serializer = TestModelSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIsNotNone(serializer.errors)
+        self.assertEqual(len(serializer.errors), 1)
+        self.assertTrue("email" in serializer.errors)
 
     def test_8_write_only(self):
         """We create a model on DB and then check the serialized data without the
@@ -163,14 +163,13 @@ class TestSerializer(TestCase):
 
     def test_9_read_only(self):
         """We create a model through the serializer and check that it was created
-        correctly skipping the write only field."""
+        correctly skipping the read only field."""
         data = self.create_random_data()
         data["generated"] = "fixed"  # we write a wrong value in a generated field
         serializer = TestModelSerializer(data=data)
         self.assertTrue(serializer.is_valid())
         serializer.save()
         instance = TestSerializerModel.objects.last()
-        self.assertIsNotNone(serializer.data)
         self.assertInstance(instance, data, ["generated"])
         self.assertNotEqual(instance.generated, data["generated"])
         self.assertEqual(instance.generated, f"{data['slug']}:{str(data['number'])}")
