@@ -57,7 +57,7 @@ class TestSerializer(TestCase):
 
     def assertEqualDictionary(self, left: dict, right: dict, exclude: list = list()):
         """Assert that all the values in the right should exists in the left."""
-        if right and left:
+        if right is not None and left is not None:
             for k, v in right.items():
                 if k not in exclude:
                     assert left.get(k) is not None, (
