@@ -6,15 +6,37 @@
 
 from __future__ import annotations
 from typing import TypeVar, Generic, Optional
+from importlib import import_module
 
-T = TypeVar("T")
-
-
-class Node(Generic[T]):
-    def __init__(self, value: T, next: Optional["Node[T]"] = None):
-        self.value = value
-        self.next = next
+linked_list = import_module("coding.problems.10_linked_list")
+LinkedList = linked_list.LinkedList
+Node = linked_list.Node
+T = linked_list.T
 
 
 def remove_dups(head: Optional[Node[T]] = None) -> Optional[Node[T]]:
-    pass
+    lista = LinkedList(head)
+
+    if lista.length == 1:
+        return head
+
+    new_list = LinkedList()
+    hashmap = {}
+    
+    def add_if_not_duplicate(index: int, value: T, node: Node[T]):
+        if value not in hashmap:
+            new_list.push(value)
+            hashmap[value] = True
+    
+    lista.visit(add_if_not_duplicate)
+    lista.print()
+    new_list.print()
+    return new_list.head
+    
+    # pointer = head
+    # while pointer and pointer.next:
+    #     if pointer.value == pointer.next.value:
+    #         pointer.next = pointer.next.next
+    #     else:
+    #         pointer = pointer.next
+    # return head

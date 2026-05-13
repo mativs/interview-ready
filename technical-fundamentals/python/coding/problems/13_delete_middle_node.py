@@ -9,15 +9,33 @@
 
 from __future__ import annotations
 from typing import TypeVar, Generic, Optional
+from importlib import import_module
 
-T = TypeVar("T")
-
-
-class Node(Generic[T]):
-    def __init__(self, value: T, next: Optional["Node[T]"] = None):
-        self.value = value
-        self.next = next
+linked_list = import_module("coding.problems.10_linked_list")
+LinkedList = linked_list.LinkedList
+Node = linked_list.Node
+T = linked_list.T
 
 
 def delete_middle_node(head: Node[T], position: int) -> Optional[Node[T]]:
-    pass
+    linked_list = LinkedList(head)
+    if position == 0 or position == linked_list.length - 1:
+        return head
+
+    linked_list.remove_by_position(position)
+    return linked_list.head
+    # if position == 0:
+    #     return head
+
+    # index = 0
+    # previous = None
+    # pointer = head
+    # while pointer and index < position:
+    #     previous = pointer
+    #     pointer = pointer.next
+    #     index += 1
+
+    # if pointer and previous:
+    #     previous.next = pointer.next
+
+    # return head

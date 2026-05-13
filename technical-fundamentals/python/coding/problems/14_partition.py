@@ -10,15 +10,39 @@
 
 from __future__ import annotations
 from typing import TypeVar, Generic, Optional
+from importlib import import_module
 
-T = TypeVar("T")
-
-
-class Node(Generic[T]):
-    def __init__(self, value: T, next: Optional["Node[T]"] = None):
-        self.value = value
-        self.next = next
+linked_list = import_module("coding.problems.10_linked_list")
+LinkedList = linked_list.LinkedList
+Node = linked_list.Node
+T = linked_list.T
 
 
 def partition(head: Optional[Node[T]], x: T) -> Optional[Node[T]]:
-    pass
+    linked_list = LinkedList(head)
+    left = LinkedList()
+    right = LinkedList()
+    def split(index:int, value: T, node: Node[T]):
+        if value < x:
+            left.push(value)
+        else:
+            right.push(value)
+    linked_list.visit(split)
+    left.merge(right)
+    return left.head
+    # left_dummy = Node(x)
+    # right_dummy = Node(x)
+    # left_pointer = left_dummy
+    # right_pointer = right_dummy
+    # pointer = head
+    # while pointer:
+    #     if pointer.value < x:
+    #         left_pointer.next = pointer
+    #         left_pointer = left_pointer.next
+    #     else:
+    #         right_pointer.next = pointer
+    #         right_pointer = right_pointer.next
+    #     pointer = pointer.next
+    # right_pointer.next = None
+    # left_pointer.next = right_dummy.next
+    # return left_dummy.next

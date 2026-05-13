@@ -12,15 +12,26 @@
 
 from __future__ import annotations
 from typing import TypeVar, Generic, Optional
+from importlib import import_module
 
-T = TypeVar("T")
-
-
-class Node(Generic[T]):
-    def __init__(self, value: T, next: Optional["Node[T]"] = None):
-        self.value = value
-        self.next = next
+linked_list = import_module("coding.problems.10_linked_list")
+LinkedList = linked_list.LinkedList
+Node = linked_list.Node
+T = linked_list.T
 
 
 def detect_loop(head: Optional[Node[T]]) -> Optional[Node[T]]:
-    pass
+    
+    def visit(index: int, value: T, node: Node[T]):
+        pass
+    linked_list = LinkedList(head)
+    return linked_list.visit(visit)
+
+    # bag = []
+    # pointer = head
+    # while pointer:
+    #     if pointer in bag:
+    #         return pointer
+    #     bag.append(pointer)
+    #     pointer = pointer.next
+    # return None

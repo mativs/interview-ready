@@ -5,18 +5,41 @@
 
 from __future__ import annotations
 from typing import TypeVar, Generic, Optional
+from importlib import import_module
 
-T = TypeVar("T")
-
-
-class Node(Generic[T]):
-    def __init__(self, value: T, next: Optional["Node[T]"] = None):
-        self.value = value
-        self.next = next
+linked_list = import_module("coding.problems.10_linked_list")
+LinkedList = linked_list.LinkedList
+Node = linked_list.Node
+T = linked_list.T
 
 
 def intersection(
     list1: Optional[Node[T]],
     list2: Optional[Node[T]],
 ) -> Optional[Node[T]]:
-    pass
+    items = []
+    def pick(index: int, value: T, node: Node[T]):
+        items.append(node)
+    ll1 = LinkedList(list1)
+    ll1.visit(pick)
+
+    answer = None
+    def check(index: int, value: T, node: Node[T]):
+        nonlocal answer
+        if node in items and answer is None:
+            answer = node
+    
+    ll2 = LinkedList(list2)
+    ll2.visit(check)
+
+    return answer
+
+    # p1 = list1
+    # while p1:
+    #     p2 = list2
+    #     while p2:
+    #         if p1 == p2:
+    #             return p1
+    #         p2 = p2.next
+    #     p1 = p1.next
+    # return None
