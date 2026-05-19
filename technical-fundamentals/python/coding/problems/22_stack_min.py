@@ -10,13 +10,20 @@ T = TypeVar("T")
 
 class StackMin(Generic[T]):
     def __init__(self):
-        pass
+        self.array = []
 
     def push(self, value: T) -> None:
-        pass
+        if not self.array:
+            self.array.append((value, value))
+        else:
+            actual_min = self.array[-1][1]
+            self.array.append((value, min(value, actual_min)))
 
     def pop(self) -> Optional[T]:
-        pass
+        return self.array.pop()[0]
 
     def min(self) -> Optional[T]:
-        pass
+        if not self.array:
+            return None
+
+        return self.array[-1][1]

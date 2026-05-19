@@ -11,16 +11,30 @@ T = TypeVar("T")
 
 class SortStack(Generic[T]):
     def __init__(self):
-        pass
+        self.stack = []
 
     def push(self, value: T) -> None:
-        pass
+        tmp_stack = []
+        while self.stack:
+            last_value = self.stack.pop()
+            if value > last_value:
+                tmp_stack.append(last_value)
+            else:
+                self.stack.append(last_value)
+                break
+        self.stack.append(value)
+        while tmp_stack:
+            self.stack.append(tmp_stack.pop())
 
     def pop(self) -> Optional[T]:
-        pass
+        if not self.stack:
+            return None
+        return self.stack.pop()
 
     def peek(self) -> Optional[T]:
-        pass
+        if not self.stack:
+            return None
+        return self.stack[-1]
 
     def is_empty(self) -> bool:
-        pass
+        return not self.stack

@@ -8,16 +8,29 @@ T = TypeVar("T")
 
 class MyQueue(Generic[T]):
     def __init__(self):
-        pass
+        self.stack = []
+        self.inverted = []
 
     def enqueue(self, value: T) -> None:
-        pass
+        if not self.stack:
+            while self.inverted:
+                self.stack.append(self.inverted.pop())
+        self.stack.append(value)
+
 
     def dequeue(self) -> Optional[T]:
-        pass
+        if not self.inverted:
+            while self.stack:
+                self.inverted.append(self.stack.pop())
+        if self.inverted:
+            return self.inverted.pop()
 
     def peek(self) -> Optional[T]:
-        pass
+        if not self.inverted:
+            while self.stack:
+                self.inverted.append(self.stack.pop())
+        if self.inverted:
+            return self.inverted[-1]
 
     def is_empty(self) -> bool:
-        pass
+        return not self.stack and not self.inverted
