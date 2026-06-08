@@ -15,6 +15,15 @@ from typing import TypeVar, Generic, Optional, List
 
 T = TypeVar("T")
 
+#       5
+#   3        7
+# 2   4   6    8
+
+
+# root = TreeNode(5,
+#             left=TreeNode(3, left=TreeNode(2), right=TreeNode(4)),
+#             right=TreeNode(7, left=TreeNode(6), right=TreeNode(8)),
+#         )
 
 class TreeNode(Generic[T]):
     def __init__(
@@ -27,6 +36,34 @@ class TreeNode(Generic[T]):
         self.left = left
         self.right = right
 
+def total_nodes(root: TreeNode[T] | None):
+    if not root:
+        return 0
+
+    return total_nodes(root.left) + total_nodes(root.right) + 1
+
+
+def backtrack(total, choices, path, answer):
+    if len(path) == total:
+        answer.append(list(path))
+        return answer
+
+    for i in range(len(choices)):
+        c = choices[i]
+        if c.value not in path:
+            path.append(c.value)
+            new_choices = choices[:i] + choices[i+1:]
+            if c.left:
+                new_choices.append(c.left)
+            if c.right:
+                new_choices.append(c.right)
+
+            backtrack(total, new_choices, path, answer)
+            path.pop()
+
+    return answer
 
 def bst_sequences(root: TreeNode[T]) -> List[List[T]]:
-    pass
+    total = total_nodes(root)
+    return backtrack(total, [root], [], [])
+    

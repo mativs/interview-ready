@@ -21,16 +21,40 @@ class TreeNode(Generic[T]):
 
 
 class Tree(Generic[T]):
+    def backtrack(self, node, answer):
+        if not node:
+            return answer
+
+        to_track = []
+        for n in [node.left, node.right]:
+            if n:
+                answer.append(n)
+                to_track.append(n)
+
+        for n in to_track:
+            self.backtrack(n, answer)
+
+        return answer
+
     def bfs(
         self,
         node: Optional[TreeNode[T]],
         visit: Callable[[TreeNode[T]], None],
     ) -> None:
-        pass
+        if node:
+            nodes = []
+            nodes.append(node)
+            self.backtrack(node, nodes)
+            while nodes:
+                visit(nodes.pop(0))
 
     def dfs(
         self,
         node: Optional[TreeNode[T]],
         visit: Callable[[TreeNode[T]], None],
     ) -> None:
-        pass
+        if node:
+            visit(node)
+            self.dfs(node.left, visit)
+            self.dfs(node.right, visit)
+            

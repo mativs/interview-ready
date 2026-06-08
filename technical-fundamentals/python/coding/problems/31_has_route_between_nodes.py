@@ -11,6 +11,20 @@ class GraphNode:
         self.value = value
         self.neighbors: List["GraphNode"] = neighbors if neighbors is not None else []
 
+def backtrack(start, end, path):
+    if start == end:
+        return True
+
+    if not start or not end:
+        return False
+
+    for n in start.neighbors:
+        if n not in path:
+            path.append(n)
+            if backtrack(n, end, path):
+                return True
+
+    return False 
 
 def has_route_between_nodes(start: GraphNode, end: GraphNode) -> bool:
-    pass
+    return backtrack(start, end, [])

@@ -21,9 +21,30 @@ class TreeNode(Generic[T]):
         self.right = right
 
 
+def find(node, q, path):
+    if node is None:
+        return None
+
+    if node is q:
+        return path
+
+    for n in [node.left, node.right]:
+        if n:
+            path.append(n)
+            if find(n, q, path):
+                return path
+            path.pop()
+
+
 def first_common_ancestor(
     root: Optional[TreeNode[T]],
     p: TreeNode[T],
     q: TreeNode[T],
 ) -> Optional[TreeNode[T]]:
-    pass
+    answer = find(root, p, [root])
+    while answer:
+        node = answer.pop()
+        if find(node, q, []):
+            return node
+
+

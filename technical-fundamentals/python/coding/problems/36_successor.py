@@ -21,6 +21,24 @@ class TreeNode(Generic[T]):
         self.right = right
         self.parent = parent
 
+def min_node(node: TreeNode[T]) -> Optional[TreeNode[T]]:
+    if not node or not node.left:
+        return node
+
+    return min_node(node.left)
 
 def successor(node: TreeNode[T]) -> Optional[TreeNode[T]]:
-    pass
+    if not node:
+        return None
+
+    if node.right is None:
+        if not node.parent:
+            return None
+
+        pointer = node.parent
+        while pointer and pointer.value < node.value:
+            pointer = pointer.parent
+
+        return pointer
+
+    return min_node(node.right)

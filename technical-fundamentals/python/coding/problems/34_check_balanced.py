@@ -20,6 +20,20 @@ class TreeNode(Generic[T]):
         self.left = left
         self.right = right
 
+def check_length(tree: Optional[TreeNode[T]]) -> bool:
+    if not tree:
+        return 0
+
+    return max([
+        check_length(tree.left),
+        check_length(tree.right)
+    ]) + 1
 
 def check_balanced(tree: Optional[TreeNode[T]]) -> bool:
-    pass
+    if not tree:
+        return True
+
+    left = check_length(tree.left)
+    right = check_length(tree.right)
+
+    return abs(left-right) <= 1

@@ -30,4 +30,12 @@ class TreeNode(Generic[T]):
 
 
 def minimal_tree(sorted_array: List[T]) -> Optional[TreeNode[T]]:
-    pass
+    if not sorted_array:
+        return None
+
+    len_array = len(sorted_array)
+    middle = len_array // 2
+    root = TreeNode(sorted_array[middle])
+    root.left = minimal_tree(sorted_array[0:middle])
+    root.right = minimal_tree(sorted_array[middle+1:])
+    return root

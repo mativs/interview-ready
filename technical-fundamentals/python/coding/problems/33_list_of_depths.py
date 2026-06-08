@@ -26,5 +26,42 @@ class ListNode(Generic[T]):
         self.next = next
 
 
+
+def dfs(node, depth, answer):
+    if not node:
+        return answer
+
+    len_answer = len(answer)
+    to_traverse = []
+    for n in [node.left, node.right]:
+        if n:
+            if depth == len_answer:
+                answer.append([])
+            answer[depth].append(n.value)
+            to_traverse.append(n)
+
+    for n in to_traverse:
+        dfs(n, depth+1, answer)
+
+    return answer
+
 def list_of_depths(root: Optional[TreeNode[T]]) -> List[ListNode[T]]:
-    pass
+    if not root:
+        return []
+
+    answer = []
+
+    answer.append([root.value])
+    dfs(root, 1, answer)
+
+    returned = []
+    for a in answer:
+        dummy = ListNode(0)
+        pointer = dummy
+        for x in a:
+            n = ListNode(x)
+            pointer.next = n
+            pointer = pointer.next
+        returned.append(dummy.next)
+
+    return returned
